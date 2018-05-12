@@ -1,7 +1,7 @@
 #[macro_use]
 extern crate text_io;
 
-fn vertex_degree_count_check(mat: Vec<Vec<i32>>) -> bool {
+fn vertex_degree_count_check(mat: &Vec<Vec<i32>>) -> bool {
     let mut n_odd = 0;
 
     for i in mat.iter() {
@@ -15,6 +15,36 @@ fn vertex_degree_count_check(mat: Vec<Vec<i32>>) -> bool {
     }
 
     true
+}
+
+fn conectivity_test(mat: &Vec<Vec<i32>>, a: i32) -> bool {
+    let mut visited: Vec<bool> = vec![false; mat.len()];
+    dfs(mat, &mut visited, a);
+
+    return all_visited(&visited);
+}
+
+fn all_visited(visited: &Vec<bool>) -> bool {
+    for i in visited.iter() {
+        if !i {
+            return false;
+        }
+    }
+
+    true
+}
+
+fn dfs(mat: &Vec<Vec<i32>>, visited: &mut Vec<bool>, a: i32) {
+    if all_visited(visited) {
+        return;
+    }
+
+    for b in mat[a as usize].iter() {
+        if !visited[*b as usize] {
+            visited[*b as usize] = true;
+            dfs(mat, visited, *b);
+        }
+    }
 }
 
 fn main() {
@@ -44,10 +74,19 @@ fn main() {
 
     println!(
         "Vertex count is {}",
-        if vertex_degree_count_check(mat) {
+        if vertex_degree_count_check(&mat) {
             "Ok"
         } else {
             "not Ok"
+        }
+    );
+
+    println!(
+        "Graph is {}",
+        if conectivity_test(&mat, n_vertex - 1) {
+            "Connected"
+        } else {
+            "not Connected"
         }
     );
 }
