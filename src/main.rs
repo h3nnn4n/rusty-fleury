@@ -1,5 +1,3 @@
-#![feature(vec_remove_item)]
-
 #[macro_use]
 extern crate text_io;
 
@@ -21,6 +19,7 @@ fn vertex_degree_count_check(mat: &Vec<Vec<i32>>) -> bool {
 
 fn conectivity_test(mat: &Vec<Vec<i32>>, a: i32) -> bool {
     let mut visited: Vec<bool> = vec![false; mat.len()];
+
     dfs(mat, &mut visited, a);
 
     return all_visited(&visited);
@@ -38,6 +37,7 @@ fn all_visited(visited: &Vec<bool>) -> bool {
 
 fn qntd_reachable_from(mat: &Vec<Vec<i32>>, a: i32) -> i32 {
     let mut visited: Vec<bool> = vec![false; mat.len()];
+
     dfs(mat, &mut visited, a);
 
     return visited.iter().map(|a| if *a { 1 } else { 0 }).sum();
@@ -58,35 +58,10 @@ fn dfs(mat: &Vec<Vec<i32>>, visited: &mut Vec<bool>, a: i32) {
 
 fn fleury(mat: &mut Vec<Vec<i32>>, a: i32) -> Vec<i32> {
     let mut result: Vec<i32> = vec![];
+
     fleury_(mat, a, &mut result);
 
     result
-}
-
-fn valid_edge(mat: &mut Vec<Vec<i32>>, a: i32, b: i32) -> bool {
-    if mat[a as usize].len() == 1 {
-        return true;
-    } else {
-        let q_before = qntd_reachable_from(mat, a);
-        remove_edge_pair(mat, a, b);
-        let q_after = qntd_reachable_from(mat, a);
-        add_edge_pair(mat, a, b);
-
-        return if q_before > q_after { false } else { true };
-    }
-}
-
-fn add_edge_pair(mat: &mut Vec<Vec<i32>>, a: i32, b: i32) {
-    mat[a as usize].push(b);
-    mat[b as usize].push(a);
-}
-
-fn remove_edge_pair(mat: &mut Vec<Vec<i32>>, a: i32, b: i32) {
-    let i1: usize = mat[a as usize].iter().position(|&r| r == b).unwrap();
-    let i2: usize = mat[b as usize].iter().position(|&r| r == a).unwrap();
-
-    mat[a as usize].remove(i1);
-    mat[b as usize].remove(i2);
 }
 
 fn fleury_(mat: &mut Vec<Vec<i32>>, starting: i32, result: &mut Vec<i32>) {
@@ -116,6 +91,32 @@ fn fleury_(mat: &mut Vec<Vec<i32>>, starting: i32, result: &mut Vec<i32>) {
             break;
         }
     }
+}
+
+fn valid_edge(mat: &mut Vec<Vec<i32>>, a: i32, b: i32) -> bool {
+    if mat[a as usize].len() == 1 {
+        return true;
+    } else {
+        let q_before = qntd_reachable_from(mat, a);
+        remove_edge_pair(mat, a, b);
+        let q_after = qntd_reachable_from(mat, a);
+        add_edge_pair(mat, a, b);
+
+        return if q_before > q_after { false } else { true };
+    }
+}
+
+fn add_edge_pair(mat: &mut Vec<Vec<i32>>, a: i32, b: i32) {
+    mat[a as usize].push(b);
+    mat[b as usize].push(a);
+}
+
+fn remove_edge_pair(mat: &mut Vec<Vec<i32>>, a: i32, b: i32) {
+    let i1: usize = mat[a as usize].iter().position(|&r| r == b).unwrap();
+    let i2: usize = mat[b as usize].iter().position(|&r| r == a).unwrap();
+
+    mat[a as usize].remove(i1);
+    mat[b as usize].remove(i2);
 }
 
 fn main() {
