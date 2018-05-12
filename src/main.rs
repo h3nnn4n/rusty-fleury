@@ -89,20 +89,32 @@ fn remove_edge_pair(mat: &mut Vec<Vec<i32>>, a: i32, b: i32) {
     mat[b as usize].remove(i2);
 }
 
-fn fleury_(mat: &mut Vec<Vec<i32>>, a: i32, result: &mut Vec<i32>) {
-    let mut pivot = a;
-    result.push(pivot);
+fn fleury_(mat: &mut Vec<Vec<i32>>, starting: i32, result: &mut Vec<i32>) {
+    let mut a = starting;
+    let mut failsafe: bool;
+    result.push(a);
 
     loop {
-        for i in 0..mat[pivot as usize].len() {
-            if mat[pivot as usize].len() > 1 {
-                let i1 = mat[i as usize].iter().position(|&r| r == 0).unwrap();
-
-                //mat[i as usize].remove(pivot);
-                //mat[pivot as usize].remove(i);
+        failsafe = true;
+        for i in 0..mat[a as usize].len() {
+            let b = mat[a as usize][i];
+            if valid_edge(mat, a, b) {
+                remove_edge_pair(mat, a, b);
+                a = b;
+                failsafe = false;
+                break;
             }
         }
-        break;
+        result.push(a);
+
+        if a == starting {
+            break;
+        }
+
+        if failsafe {
+            println!("Stuck in a loop. Aborting");
+            break;
+        }
     }
 }
 
@@ -131,21 +143,26 @@ fn main() {
         println!();
     }
 
-    println!(
-        "Vertex count is {}",
-        if vertex_degree_count_check(&mat) {
-            "Ok"
-        } else {
-            "not Ok"
-        }
-    );
+    let check1 = vertex_degree_count_check(&mat);
+    let check2 = conectivity_test(&mat, n_vertex - 1);
 
-    println!(
-        "Graph is {}",
-        if conectivity_test(&mat, n_vertex - 1) {
-            "Connected"
-        } else {
-            "not Connected"
-        }
-    );
+    if !check1 {
+        println!("Graph not eulerian");
+    }
+
+    if !check2 {
+        println!("Graph disconected");
+    }
+
+    if !check1 || !check2 {
+        println!("Exiting");
+        return;
+    }
+
+    let result = fleury(&mut mat, 0);
+
+    for i in result.iter() {
+        print!("{} ", *i);
+    }
+    println!();
 }
