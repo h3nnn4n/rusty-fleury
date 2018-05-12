@@ -3,7 +3,6 @@ extern crate text_io;
 
 fn vertex_degree_count_check(mat: Vec<Vec<i32>>) -> bool {
     let mut n_odd = 0;
-    let mut n_even = 0;
 
     for i in mat.iter() {
         if i.len() % 2 != 0 {
